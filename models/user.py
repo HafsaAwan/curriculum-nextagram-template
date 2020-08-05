@@ -26,7 +26,7 @@ class User(BaseModel):
         # Password should have at least one special character (REGEX comes in handy here)
         has_lower = re.search(r"[a-z]", self.password)
         has_upper = re.search(r"[A-Z]", self.password)
-        has_special = re.search(r"[\[ \] \* \$ \% \^ \& \# ]", self.password)
+        has_special = re.search(r"[\[ \] \* \$ \% \^ \& \# \@ \? ]", self.password)
 
         if has_lower and has_upper and has_special:
             self.password_hash = generate_password_hash(self.password)
