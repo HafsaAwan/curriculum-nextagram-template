@@ -8,17 +8,33 @@
     <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
         <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
         <li class="nav-item active">
-            <a class="nav-link" href="{{ url_for('home') }}">Home <span class="sr-only">(current)</span></a>
+            <a class="nav-link btn btn-dark" href="{{ url_for('home') }}">Home <span class="sr-only">(current)</span></a>
         </li>
+
+        {% if current_user.is_authenticated %}
+
+        <li class="nav-item">
+            <form action="{{url_for('users.edit', id=current_user.id)}}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <input type="submit" class="btn btn-info" value="Change details">
+            </form>                
+        </li>
+
+        <li class="nav-item">
+            <form action="{{url_for('sessions.destroy')}}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <input type="submit" class="btn btn-danger" value="Logout">
+            </form>                
+        </li>
+        {% else %}
         <li class="nav-item">
             <a class="nav-link" href="{{ url_for('sessions.new') }}">Sign In</a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('sessions.destroy') }}">Sign Out</a>
-        </li>
+
         <li class="nav-item">
             <a class="nav-link" href="{{ url_for('users.new') }}">Sign Up</a>
         </li>
+        {% endif %}
         </ul>
         
     </div>
