@@ -8,9 +8,13 @@
 {% endblock %}
 
 {% block content %}
-  <h1>Homepage</h1>
-  {% if current_user.authenticated %}
-    <h6>You now login as {{current_user.username}}.</h6>
+
+  {% if current_user.is_authenticated %}
+    <h4>You now login as {{current_user.username}}.</h4>
   {% endif %}
+
+  {% for user in users%}
+    <li><a href="{{url_for('users.show', username=user.username)}}">{{user.username}}</a></li>
+  {% endfor %}
 
 {% endblock %}

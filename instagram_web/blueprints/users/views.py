@@ -2,6 +2,8 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from models.user import User
 import re
 from flask_login import login_user, logout_user, login_required, current_user
+from instagram_web.util.helpers import upload_file_to_s3
+from werkzeug import secure_filename
 
 users_blueprint = Blueprint('users',
                             __name__,
@@ -39,10 +41,11 @@ def show(username):
 
 @users_blueprint.route('/', methods=["GET"])
 def index():
-    return "USERS"
+    users = User.select()
+    return render_template('home.html', users=users)
 
 
-@users_blueprint.route('/<id>/edit', methods=['GET','POST'])
+@users_blueprint.route('/<id>/edit', methods=['GET'])
 @login_required
 def edit(id):
     user = User.get_or_none(User.id == id)
@@ -87,6 +90,45 @@ def update(id):
         flash("No such user!")
         redirect(url_for("home"))
 
+@users_blueprint.route('/<id>/upload', methods=['POST'] )
+@login_required
+def upload(id):
+    user = User.get_or_none(User.id == id)
 
+    if user:
+        if current_user.id == int(id):
+            # We check the request.files object for a user_file key. (user_file is the name of the file input on our form). If it's not there, we return an error message.
+            if "profile_image" not in request.files:
+                flash("No file provided!")
+                return redirect(url_for('users.edit', id = id))
+
+            # If the key is in the object, we save it in a variable called file.
+            file = request.files["profile_image"]
+            
+            # we sanitize the filename using the secure_filename helper function provided by the werkzeurg.security module.
+            file.filename = secure_filename(file.filename)
+
+            # get path to image on S3 bucket using function in helper.py
+            image_path = upload_file_to_s3(file, user.username)
+
+            # update user with image path
+            user.image_path = image_path
+ 
+            # if user save successfull, redirect to show user show page
+            if user.save():
+                flash("Yayyy! Avatar uploaded!", "success")
+                return redirect(url_for("users.show", username = user.username))
+            else:
+                # flash error message and redirect to edit page 
+                flash("Failed to upload avatar. Please try again!")
+                return redirect(url_for("users.edit", id = id))
+        else:
+            # current user is not same as one trying to upload
+            flash("Cannot edit avatar of other users!","danger")
+            return redirect(url_for("users.show", username = user.username))
+    else:
+        # if no no user
+        flash("No such user found!", "danger")
+        return redirect(url_for('home')) 
 
                 

@@ -24,6 +24,19 @@
         <button type="submit" class="btn btn-primary">Update</button>
     </form>
 </div>
+<div style="margin: 80px; border: 1px solid blue;"> 
+    <h3>Upload Your Avatar</h3>
+
+    <form action="{{url_for('users.upload', id=user.id)}}" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <label for="user_file">Upload Your Avatar</label>
+        <br></br>
+        <input type="file" name="profile_image">
+        <br></br>
+        <button type="submit">Upload</button>
+
+    </form>
+</div>
 
 
 {% endblock %}

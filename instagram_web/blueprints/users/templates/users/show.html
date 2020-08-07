@@ -1,5 +1,24 @@
-{%extends '_layout.html' %}
+{% extends '_layout.html' %}
 
 {% block content %}
-  <h1>This is {{user.username}}'s Profile</h1>
+  <div class="d-flex flex-column" style="margin: 5px; background-color: silver;">
+
+    <div class="d-flex justify-content-center" style="margin: 10px;">
+      <div class="card" style="width: 18rem; border: none;">
+        <h5 class="card-title" style="text-align: center;">{{user.username}}'s Profile</h5>
+        <img class="card-img-top rounded-circle align-items-center" src="{{user.full_image_path}}" alt="Card image cap">
+
+      </div>
+    </div>
+    
+
+    <div style="margin-top: 10px;">
+      {% for image in user.images %}
+        <img src="{{image.full_image_url}}" width="500" style="padding: 5px;"/>
+      {% endfor %}
+    </div>
+  
+  </div>
+
+  
 {% endblock %}
