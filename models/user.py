@@ -31,7 +31,8 @@ class User(UserMixin,BaseModel):
         if existing_user_username and existing_user_username.id != self.id:
             self.errors.append(f"User with username {self.username} already exists!")
         
-            # Password should be longer than 6 characters
+        # Password should be longer than 6 characters
+        if self.password:
             if len(self.password) <= 6:
                 self.errors.append("Password is less than 6 characters")
             # Password should have both uppercase and lowercase characters

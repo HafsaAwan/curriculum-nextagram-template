@@ -7,17 +7,17 @@
     
     <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
         <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
-        <li class="nav-item active">
+        <li class="nav-item">
             <a class="nav-link btn btn-dark" href="{{ url_for('users.index')}}">Home</a>
         </li>
-        <li class="nav-item active">
-            <a class="nav-link btn btn-dark" href="{{ url_for('users.show', username=current_user.username)}}">My Profile</a>
-        </li>
+
 
         {% if current_user.is_authenticated %}
-
         <li class="nav-item">
-            <a class="nav-link btn btn-dark" href="{{ url_for('users.edit', id=current_user.id) }}">Edit details</a>                          
+            <a class="nav-link btn btn-dark" href="{{ url_for('users.show', username=current_user.username)}}">My Profile</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link btn btn-dark" href="{{url_for('users.edit',id=current_user.id)}}">Edit Profile</a>
         </li>
         <li class="nav-item">
             <a class="nav-link btn btn-dark" href="{{ url_for('images.new') }}">Upload Images</a>                  

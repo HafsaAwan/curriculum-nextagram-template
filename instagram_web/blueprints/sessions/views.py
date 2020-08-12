@@ -3,6 +3,7 @@ from models.user import User
 import peewee as pw
 from werkzeug.security import check_password_hash
 from flask_login import login_user, logout_user, login_required
+from instagram_web.util.google_oauth import oauth
 
 sessions_blueprint = Blueprint('sessions',
                             __name__,
@@ -44,3 +45,21 @@ def destroy():
     logout_user()
     flash("Logout Successful!", "success")
     return redirect(url_for("sessions.new"))
+
+@sessions_blueprint.route("/google_login")
+def google_login():
+    redirect_uri = url_for('sessions.authorize', _external = True)
+    return oauth.google.authorize_redirect(redirect_uri)
+
+@sessions_blueprint.route('/authorize/google')
+def authorize():
+    oauth.google.authorize_access_token()
+    email = oauth.google.get('https://www.googleapis.com/oauth2/v2/userinfo').json()['email']
+    user = User.get_or_none(User.email == email)
+
+    if user:
+        login_user(user)
+        return redirect(url_for("users.show", username=user.username))
+    else:
+        flash("Login failed. Please try again!", "error")
+        redirect(url_for('sessions.new'))

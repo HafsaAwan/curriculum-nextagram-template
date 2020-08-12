@@ -1,0 +1,9 @@
+<h1>Image Id: {{image.id}}</h1>
+
+<img src="{{image.full_image_url}}" />
+
+<ul>
+  {% for donation in image.donations %}
+    <li>{{donation.sender.username}} : {{donation.amount}}</li>
+  {% endfor %}
+</ul>

@@ -1,5 +1,6 @@
 import boto3, botocore
 from app import app
+import braintree
 
 s3 = boto3.client(
    "s3",
@@ -23,3 +24,13 @@ def upload_file_to_s3(file, username, acl="public-read"):
         print("Something Happened: ", e)
         return e
     return "{}/{}".format(username, file.filename)
+
+# From braintree library, create a gateway
+gateway = braintree.BraintreeGateway(
+    braintree.Configuration(
+        braintree.Environment.Sandbox,
+        merchant_id=app.config.get("BT_MERCHANT_ID"),
+        public_key=app.config.get("BT_PUBLIC_KEY"),
+        private_key=app.config.get("BT_PRIVATE_KEY")
+    )
+)    
