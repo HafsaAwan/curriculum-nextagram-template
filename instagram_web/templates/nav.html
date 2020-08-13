@@ -17,9 +17,6 @@
             <a class="nav-link btn btn-dark" href="{{ url_for('users.show', username=current_user.username)}}">My Profile</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link btn btn-dark" href="{{url_for('users.edit',id=current_user.id)}}">Edit Profile</a>
-        </li>
-        <li class="nav-item">
             <a class="nav-link btn btn-dark" href="{{ url_for('images.new') }}">Upload Images</a>                  
         </li>
         <li class="nav-item">

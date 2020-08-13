@@ -8,14 +8,58 @@
 {% endblock %}
 
 {% block content %}
-<div class="container" style="margin: 40px;">
-  {% if current_user.is_authenticated %}
-    <h4>Welcome {{current_user.username}}!</h4>
-  {% endif %}
-  <h5>All users:</h5>
-  {% for user in users%}
-    <li><a href="{{url_for('users.show', username=user.username)}}">{{user.username}}</a></li>
-  {% endfor %}
+<div class="container d-flex flex-wrap">
+
+  <div class="d-flex flex-wrap col-8">
+    <h5 class="w-100">All users:</h5>
+    {% for user in users%}
+      <div class="card" style="width: 18rem;">
+        <img class="card-img-top" src="{{user.full_image_path}}" alt="profile-image">
+        <div class="card-body">
+          <h5 class="card-title"><a href="{{url_for('users.show', username=user.username)}}">{{user.username}}</a></h5>
+          <form action="{{url_for('users.follow',idol_id=user.id)}}" method="POST">
+            <input type="hidden" name="csrf_token" value= "{{ csrf_token() }}">
+            <input class="btn btn-primary" type="submit" value="Follow">
+          </form>
+        </div>
+      </div>
+
+    {% endfor %}
+  </div>
+
+  <div class="col-4">
+    {% if current_user.is_authenticated %}
+      <h4>Welcome {{current_user.username}}!</h4>
+
+      <div class="card" style="width: 18rem;">
+        <div class="card-header">
+          Idols:
+        </div>
+        <ul class="list-group list-group-flush">
+          {% for idol in current_user.idols %}
+                <li class="list-group-item">{{idol.username}}
+                <form action="{{url_for('users.unfollow',idol_id=idol.id)}}" method="POST">
+                  <input type="hidden" name="csrf_token" value= "{{ csrf_token() }}">
+                  <input class="btn btn-primary" type="submit" value="Unfollow">
+                </form>
+              </li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <div class="card" style="width: 18rem;">
+        <div class="card-header">
+          Fans:
+        </div>
+        <ul class="list-group list-group-flush">
+          {% for fan in current_user.fans %}
+            <li class="list-group-item">{{fan.username}}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+  </div>
+
 
 </div>
 

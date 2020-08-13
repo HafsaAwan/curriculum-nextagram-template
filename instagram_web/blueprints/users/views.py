@@ -4,6 +4,8 @@ import re
 from flask_login import login_user, logout_user, login_required, current_user
 from instagram_web.util.helpers import upload_file_to_s3
 from werkzeug import secure_filename
+import peewee as pw
+
 
 users_blueprint = Blueprint('users',
                             __name__,
@@ -131,4 +133,48 @@ def upload(id):
         flash("No such user found!", "danger")
         return redirect(url_for('home')) 
 
-                
+@users_blueprint.route('/<id>/private', methods=['POST'] )
+@login_required
+def change_privacy(id):
+    user = User.get_or_none(User.id == id)
+    print("in change privacy")
+    if user:
+        if current_user.id == int(id):
+            user.is_private = not user.is_private
+            print(user.is_private)
+            if user.save():
+                flash("Successfully updated privacy setting", "success")
+                return redirect(url_for("users.show", username = user.username))
+            else:
+                flash("Failed to update privacy setting", "success")
+                return redirect(url_for("users.show", username = user.username))
+    else: 
+        flash("Cannot change setting for another user", "danger")
+        return redirect(url_for("users.show", username = user.username))
+
+@users_blueprint.route('/<idol_id>/follow', methods=['POST'])
+@login_required
+def follow(idol_id):
+    idol=User.get_by_id(idol_id)
+
+    if current_user.follow(idol):
+        if current_user.follow_status(idol).is_approved:
+            flash(f"You follow {idol.username}", "primary")
+        else:
+            flash(f"You send request to follow {idol.username}", "primary")
+        return redirect(url_for('users.show', username=idol.username))
+    else:
+        flash(f"Unable to follow this user, try again", "danger")
+        return redirect(url_for('users.show', username=idol.username))
+
+@users_blueprint.route('/<idol_id>/unfollow', methods=['POST'])
+@login_required
+def unfollow(idol_id):
+    idol=User.get_by_id(idol_id)
+
+    if current_user.unfollow(idol):
+        flash(f"You no longer follow {idol.username}", "primary")
+        return redirect(url_for('users.show', username=idol.username))
+    else:
+        flash(f"Unable to unfollow this user, try again", "danger")
+        return redirect(url_for('users.show', username=idol.username))

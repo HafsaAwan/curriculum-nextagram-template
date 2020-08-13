@@ -1,26 +1,92 @@
 {% extends '_layout.html' %}
 
 {% block content %}
-  <div class="d-flex flex-column" style="margin: 5px; background-color: silver;">
 
-    <div class="d-flex justify-content-center">
-      <div class="card" style="width: 18rem; border: none;">
-        <h5 class="card-title" style="text-align: center;">{{user.username}}'s Profile</h5>
-        <img class="card-img-top img-thumbnail rounded-circle align-items-center" src="{{user.full_image_path}}" alt="Card image cap">
+<div class="d-flex justify-content-center">
+  <div class="card" style="width: 18rem; border: none;">
+    <h5 class="card-title" style="text-align: center;">{{user.username}}'s Profile</h5>
+    <img class="card-img-top img-thumbnail rounded-circle align-items-center" src="{{user.full_image_path}}" alt="Card image cap">
+  </div>
+  <div>
+    {% if current_user.id == user.id %}
+      <a class="nav-link btn btn-primary" style="margin: 10px;" href="{{url_for('users.edit',id=current_user.id)}}">Edit Profile</a>
+      {% if user.is_private %}
+      <form action="{{url_for('users.change_privacy',id=current_user.id)}}" method="POST">
+        <input type="hidden" name="csrf_token" value= "{{ csrf_token() }}">
+        <input class="nav-link btn btn-primary" style="margin: 10px;" class="btn btn-primary" type="submit" value="Make Profile Public">
+      </form>
+      {% else %}
+      <form action="{{url_for('users.change_privacy',id=current_user.id)}}" method="POST">
+        <input type="hidden" name="csrf_token" value= "{{ csrf_token() }}">
+        <input class="nav-link btn btn-primary" style="margin: 10px;" class="btn btn-primary" type="submit" value="Make Profile Private">
+      </form>      
+      {% endif %}
+    {% endif %}
+  </div>
+</div>
+  <!-- tabbed content begin -->
+  <div>
+    <nav style="text-align: center;">
+      <div class="nav nav-tabs" id="nav-tab" role="tablist">
+        <a class="nav-item nav-link active" id="nav-gallery-tab" data-toggle="tab" href="#nav-gallery" role="tab" aria-controls="nav-gallery" aria-selected="true">Gallery</a>
+        <a class="nav-item nav-link" id="nav-followers-tab" data-toggle="tab" href="#nav-followers" role="tab" aria-controls="nav-followers" aria-selected="false">Followers</a>
+        <a class="nav-item nav-link" id="nav-following-tab" data-toggle="tab" href="#nav-following" role="tab" aria-controls="nav-following" aria-selected="false">Following</a>
+      </div>
+    </nav>
+    <div class="tab-content" id="nav-tabContent">
+      <!-- Gallery tab -->
+      <div class="tab-pane fade show active" id="nav-gallery" role="tabpanel" aria-labelledby="nav-edit-tab">
+        <div class="card-columns">
+          {% if current_user.id == user.id or not user.is_private %}
+            {% for image in user.images %}
+              <div class="card">
+                <img class="card-img" src="{{image.full_image_url}}" alt="Card image" />
+                {# only show if current user is not owner of profile #}
+                {% if not current_user.id == user.id %}
+                <div>
+                  <a href="{{url_for('donations.new',image_id=image.id)}}" class="btn btn-primary">Donate</a>
+                </div>
+                {% endif %}
+              </div>
 
+            {% endfor %}
+          {% else %}
+            <span class="mx-auto">This profile is private. Follow @{{user.username}} to continue.</span>
+          {% endif %}  
+        </div>
+      </div>
+      <!-- followers tab -->
+      <div class="tab-pane fade" id="nav-followers" role="tabpanel" aria-labelledby="nav-followers-tab">
+        <ul>
+          <h6>{{user.username}}'s Idols</h6>
+          {% for idol in user.idols %}
+            <li>{{idol.username}}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="tab-pane fade" id="nav-following" role="tabpanel" aria-labelledby="nav-following-tab">
+        <ul>
+          <h6>{{user.username}}'s Fans</h6>
+          {% for fan in user.fans %}
+            <li>{{fan.username}}</li>
+          {% endfor %}
+        </ul>
       </div>
     </div>
+  </div>
+  <!-- tabbed content end -->
     
 
-    <div class="container" style="margin: auto;">
-      {% for image in user.images %}
-      <a href="{{url_for('donations.new', image_id=image.id)}}">
-        <img src="{{image.full_image_url}}" width="450" height="450" style="padding: 5px; border: 1px solid black; padding: 5px; margin: 5px; border-radius: 5%;"/>
-      </a>
-        {% endfor %}
-    </div>
-  
-  </div>
 
-  
+
+<!-- <div class="container" style="margin: auto;">
+  {% for image in user.images %}
+  <a href="{{url_for('donations.new', image_id=image.id)}}">
+    <img src="{{image.full_image_url}}" width="450" height="450" style="padding: 5px; border: 1px solid black; padding: 5px; margin: 5px; border-radius: 5%;"/>
+  </a>
+    {% endfor %}
+</div> -->
+
+
+ 
 {% endblock %}
